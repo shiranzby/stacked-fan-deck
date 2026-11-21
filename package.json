@@ -1,0 +1,30 @@
+{
+  "name": "stacked-fan-deck",
+  "version": "1.0.0",
+  "description": "Zero-dependency Stacked Fan-Deck & Zero-Flicker CSS Grid Accordion Folder component with Portal fly-over shuffling and touch/mouse swipe support.",
+  "main": "src/fan-deck.js",
+  "style": "src/fan-deck.css",
+  "files": [
+    "src/",
+    "README.md",
+    "ADAPTATION.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "fan-deck",
+    "card-stack",
+    "accordion",
+    "swipe",
+    "portal",
+    "vanilla-js",
+    "zero-dependency",
+    "ui-component"
+  ],
+  "author": "shiranzby",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shiranzby/stacked-fan-deck.git"
+  },
+  "homepage": "https://shiranzby.github.io/stacked-fan-deck/"
+}

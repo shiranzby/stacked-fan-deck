@@ -1,0 +1,295 @@
+:root {
+  --fd-surface: #ffffff;
+  --fd-surface-2: #f4f5f7;
+  --fd-surface-hover: rgba(0, 0, 0, 0.025);
+  --fd-border: rgba(15, 23, 42, 0.1);
+  --fd-accent: #fb7299;
+  --fd-text: #111827;
+  --fd-muted: #6b7280;
+  --fd-radius: 16px;
+}
+
+[data-theme="dark"],
+.dark {
+  --fd-surface: #131722;
+  --fd-surface-2: #1b2030;
+  --fd-surface-hover: rgba(255, 255, 255, 0.03);
+  --fd-border: #23293a;
+  --fd-accent: #fb7299;
+  --fd-text: #f3f4f6;
+  --fd-muted: #9ca3af;
+}
+
+/* 全屏悬浮 Portal 层：z-index 高于常规侧边栏与顶栏，使洗牌卡片可越过容器与侧边栏飞出 */
+.fan-float-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* 文件夹外框：overflow: visible 允许卡片越出圆角矩形 */
+.fan-folder-card {
+  position: relative;
+  background: var(--fd-surface);
+  border: 1px solid var(--fd-border);
+  border-radius: var(--fd-radius);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  overflow: visible;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fan-folder-card.is-shuffling {
+  z-index: 25;
+}
+
+.fan-folder-card:hover {
+  border-color: color-mix(in srgb, var(--fd-accent) 45%, var(--fd-border));
+}
+
+.fan-folder-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px 22px;
+  padding: 18px 22px;
+  border-radius: var(--fd-radius);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.fan-folder-card.expanded .fan-folder-head {
+  border-radius: var(--fd-radius) var(--fd-radius) 0 0;
+}
+
+.fan-folder-head:hover {
+  background-color: var(--fd-surface-hover);
+}
+
+/* 扇形卡组交互区（禁用文本选中与系统原生拖拽，防止浏览器超级拖拽/手势插件误触发） */
+.fan-deck-wrap {
+  position: relative;
+  z-index: 10;
+  width: 206px;
+  height: 118px;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.fan-deck-wrap.is-dragging {
+  cursor: grabbing;
+}
+
+.fan-deck {
+  position: relative;
+  width: 180px;
+  height: 101px;
+  perspective: 700px;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+/* 单张扇形卡片 */
+.fan-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 11px;
+  overflow: hidden;
+  border: 1.5px solid var(--fd-surface);
+  background: var(--fd-surface-2);
+  transform-origin: 15% 88%;
+  -webkit-user-drag: none;
+  user-drag: none;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.28s ease,
+              box-shadow 0.28s ease;
+  will-change: transform, opacity;
+}
+
+.fan-card img.fan-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+.fan-card-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, var(--fd-surface-2), var(--fd-surface));
+  border: 1px solid var(--fd-border);
+  border-radius: 11px;
+  box-sizing: border-box;
+  color: var(--fd-text);
+}
+
+/* 4 个扇形堆叠槽位 */
+.fan-card.pos-0 {
+  z-index: 3;
+  transform: translate(0, 0) rotate(0deg) scale(1);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+  opacity: 1;
+}
+
+.fan-card.pos-1 {
+  z-index: 2;
+  transform: translate(13px, 7px) rotate(3.6deg) scale(0.94);
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
+  opacity: 0.92;
+}
+
+.fan-card.pos-2 {
+  z-index: 1;
+  transform: translate(24px, 14px) rotate(7.2deg) scale(0.88);
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+  opacity: 0.76;
+}
+
+.fan-card.pos-back {
+  z-index: 0;
+  transform: translate(28px, 17px) rotate(9deg) scale(0.84);
+  box-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 悬停文件夹时扇形微微张开 */
+.fan-folder-head:hover .fan-deck-wrap:not(.is-dragging) .fan-card.pos-0 {
+  transform: translate(-3px, -2px) rotate(-1.2deg) scale(1.02);
+}
+
+.fan-folder-head:hover .fan-deck-wrap:not(.is-dragging) .fan-card.pos-1 {
+  transform: translate(17px, 9px) rotate(5.2deg) scale(0.94);
+}
+
+.fan-folder-head:hover .fan-deck-wrap:not(.is-dragging) .fan-card.pos-2 {
+  transform: translate(30px, 17px) rotate(9.8deg) scale(0.88);
+}
+
+/* 中部信息 & 右侧操作区 */
+.fan-folder-info {
+  flex: 1 1 220px;
+  min-width: 200px;
+}
+
+.fan-folder-title-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 7px;
+  flex-wrap: wrap;
+}
+
+.fan-folder-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.fan-folder-name {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--fd-text);
+}
+
+.fan-folder-cnt {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--fd-surface-2);
+  color: var(--fd-muted);
+}
+
+.fan-folder-previews {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fan-folder-pv {
+  font-size: 12.5px;
+  color: var(--fd-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fan-folder-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.fan-chev-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--fd-border);
+  background: var(--fd-surface);
+  color: var(--fd-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.fan-folder-card.expanded .fan-chev-btn {
+  transform: rotate(180deg);
+  color: var(--fd-accent);
+  border-color: var(--fd-accent);
+}
+
+/* 零闪烁平滑手风琴展开 */
+.fan-folder-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  border-radius: 0 0 var(--fd-radius) var(--fd-radius);
+  overflow: hidden;
+  transition: grid-template-rows 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fan-folder-card.expanded .fan-folder-collapse {
+  grid-template-rows: 1fr;
+}
+
+.fan-folder-collapse-inner {
+  overflow: hidden;
+}
+
+.fan-folder-items {
+  border-top: 1px solid var(--fd-border);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .fan-folder-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px;
+  }
+  .fan-folder-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
